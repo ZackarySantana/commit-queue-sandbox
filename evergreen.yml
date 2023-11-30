@@ -2,6 +2,7 @@
 ignore:
     - "*.md" # don't schedule tests if a commit only changes markdown files
 stepback: true
+pre_error_fails_task: true
 
 buildvariants:
     - display_name: Ubuntu 20.04
@@ -10,6 +11,11 @@ buildvariants:
           - ubuntu2004
       tasks:
           - name: task1
+
+pre: &pre
+    - command: git.get_project
+      params:
+          directory: src
 
 tasks:
     - name: task1
