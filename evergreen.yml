@@ -1,10 +1,25 @@
 stepback: true
 
+modules:
+  - name: spruce
+    owner: evergreen-ci
+    repo: spruce
+    branch: main
+    auto_update: true
+  - name: ui
+    owner: evergreen-ci
+    repo: ui
+    branch: main
+    auto_update: true
+
 buildvariants:
     - display_name: Tests
       name: ubuntu
       run_on:
           - ubuntu2204-small
+      modules:
+          - spruce
+          - ui
       tasks:
           - name: first-task
           - name: another-task
@@ -15,13 +30,22 @@ buildvariants:
           - name: noise-task-2
           - name: noise-task-3
           - name: generator
+          - name: clone-test
 
 functions:
     clone-project:
-        command: git.get_project
-        params:
-            directory: src
-
+        - command: git.get_project
+          type: setup
+          params:
+              directory: src
+    clone-project-and-modules:
+        - command: git.get_project
+          type: setup
+          params:
+              directory: src
+              revisions:
+                  spruce: ${spruce}
+                  ui: ${ui}
 
 tasks:
     - name: first-task
@@ -87,4 +111,9 @@ tasks:
             params:
                 files:
                     - src/generator.json
-                  
+    - name: clone-source
+      commands:
+          - func: clone-project
+    - name: clone-module
+      commands:
+          - func: clone-project-and-modules
